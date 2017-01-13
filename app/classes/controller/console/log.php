@@ -30,9 +30,13 @@ class Controller_Console_Log extends Controller_BaseController
 
         $params['codes'] = \Model_ProductCode::query()->get();
 
-        $params['items'] = \Model_ProductCodeLog::query()
-            ->order_by(['id' => 'desc'])
-            ->get();
+        $pid = \Input::get('pid', false);
+        $product = \Model_ProductCodeLog::query();
+        if($pid){
+            $product->where('product_id', $pid);
+        }
+        $product->order_by(['id' => 'desc']);
+        $params['items'] = $product->get();
 
         \View::set_global($params);
         $this->template->content = \View::forge("{$this->theme}/log/index");

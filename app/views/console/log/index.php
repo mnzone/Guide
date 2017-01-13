@@ -2,6 +2,9 @@
     .new{
         color: #5cb85c;
     }
+    .btn{
+        color: #fff;
+    }
 </style>
 
 <div class="container-fluid">
@@ -18,9 +21,6 @@
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <div>
-                <?= \Config::get('base_url'); ?>jetbrains/activation/
-            </div>
             <table class="table table-bordered">
                 <thead>
                 <tr>
@@ -36,21 +36,20 @@
                 </thead>
                 <tbody>
                 <?php foreach ($items as $value) { ?>
-                    <tr>
+                    <tr data-pname="<?= $value->product->display_name; ?>" data-code="<?= $value->code->code ?>" data-keyword="<?= $value->license_id; ?>">
                         <td><?= $value->id ?></td>
                         <td>
                             <?= $value->product->display_name; ?>
-
                         </td>
                         <td><?= $value->code->id ?></td>
                         <td><?= $value->code->license_id ?></td>
-                        <td data-code="<?= $value->code->code ?>">
+                        <td>
                             <a href="javascript:;" class="btn btn-primary" data-toggle="modal" data-target="#codeModal">点击查看激活码</a>
                         </td>
                         <td><?= $value->code->expired_at ? date('Y-m-d H:i:s', $value->code->expired_at) : '永久有效'; ?></td>
                         <td><?= $value->license_id;?></td>
                         <td>
-                            <a class="btn btn-primary">发送激活码</a>
+                            <a class="btn btn-primary" data-toggle="modal" data-target="#sendModal">发送激活码</a>
                         </td>
                     </tr>
                 <?php } ?>
@@ -78,50 +77,27 @@
     </div>
 </div>
 
-<div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="newModalLabel" aria-hidden="true">
+<div class="modal fade" id="sendModal" tabindex="-1" role="dialog" aria-labelledby="sendModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="frmCode">
+            <form id="frmSendModal">
                 <div class="modal-body">
-
+                    <input type="hidden" id="txtSubject" name="subject" value=""/>
                     <div class="form-group">
                         <label for="txtEmail">邮箱地址</label>
-                        <input type="email" class="form-control" id="txtEmail" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+                        <input type="email" class="form-control" id="txtEmail" name="to" aria-describedby="emailHelp" placeholder="Enter email">
                     </div>
                     <div class="form-group">
-                        <label for="txtEmail">激活码所属软件系列</label>
-                        <select class="form-control" name="category_id" id="category_id">
-                            <?php foreach ($cats as $product) { ?>
-                                <option value="<?= $product->id; ?>"<?= $product->id == \Input::get('cid', 0) ? ' selected' : ''; ?>><?= $product->name; ?></option>
-                            <?php } ?>
-                        </select>
+                        <label for="txtEmail">激活码</label>
+                        <input type="email" class="form-control" id="txtKeyword" name="keyword" value="" aria-describedby="keyword" placeholder="激活码关键字">
                     </div>
                     <div class="form-group">
-                        <label for="txtAccount">登录信息</label>
-                        <div class="clearfix">
-                            <input type="text" class="form-control pull-left" style="width: 49%; margin-right: 10px;" id="txtAccount" name="account" placeholder="登录用户名">
-                            <input type="text" class="form-control pull-right" style="width: 49%;" id="txtPwd" name="password" placeholder="登录密码">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="txtName">授权信息</label>
-                        <div class="clearfix">
-                            <input type="text" class="form-control pull-left" style="width: 32%; margin-right: 10px;" id="txtName" name="username" placeholder="授权名">
-                            <input type="text" class="form-control pull-left" style="width: 32%; margin-right: 10px;" id="txtLicenseId" name="license_id" placeholder="授权ID">
-                            <input type="date" class="form-control pull-left" style="width: 32%;" id="txtExpiredAt" name="expired_at" placeholder="有效期截止时间">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="txtProductCode">激活码</label>
-                        <textarea class="form-control" id="txtProductCode" name="code" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="txtRemark">备注</label>
-                        <textarea class="form-control" id="txtRemark" name="remark" style="height: 60px;"></textarea>
+                        <label for="txtProductCode">邮件内容</label>
+                        <textarea class="form-control" id="txtBody" name="body" rows="3"></textarea>
                     </div>
                     <div style="text-align: right">
                         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                        <button type="submit" id="btnSubmit" class="btn btn-primary" data-dismiss="modal">保存</button>
+                        <button type="submit" id="btnSendEmail" class="btn btn-primary" data-dismiss="modal">发送</button>
                     </div>
                 </div>
             </form>
@@ -130,12 +106,14 @@
 </div>
 <?php
 
+$domain = \Config::get('base_url');
 $script = <<<js
+    var domain = '{$domain}';
 js;
 
 \Asset::js($script, [], 'before-script', true);
 \Asset::js([
-    'console/code/index.js'
+    'console/log/index.js'
 ], [], 'js-files', false);
 
 ?>
