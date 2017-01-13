@@ -86,9 +86,8 @@ class Controller_Console_Log extends Controller_BaseController
         $email->subject($data['subject']);
         $email->body($data['body']);
 
-        $result = false;
         try{
-            $result = $email->send();
+            $email->send();
             $msg = [
                 'status' => 'succ',
                 'msg' => '',
@@ -97,8 +96,6 @@ class Controller_Console_Log extends Controller_BaseController
         } catch(\EmailSendingFailedException $e) {
             $msg['msg'] = $e->getMessage();
         } catch(\EmailValidationFailedException $e) {
-            $msg['msg'] = $e->getMessage();
-        } catch(\Email\SmtpCommandFailureException $e){
             $msg['msg'] = $e->getMessage();
         }
 

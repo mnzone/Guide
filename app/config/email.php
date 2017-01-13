@@ -123,13 +123,13 @@ return array(
 			'username' => 'soft@mnzone.cn',
 			'password' => '`12qwaszx',
 			'timeout'  => 5,
-			'starttls' => false,
+			'starttls' => true,
 		),
 
 		/**
 		 * Newline
 		 */
-		'newline' => "\n",
+		'newline' => "\r\n",
 
 		/**
 		 * Attachment paths
