@@ -123,7 +123,7 @@ return array(
 			'username' => 'soft@mnzone.cn',
 			'password' => '`12qwaszx',
 			'timeout'  => 5,
-			'starttls' => true,
+			'starttls' => false,
 		),
 
 		/**
